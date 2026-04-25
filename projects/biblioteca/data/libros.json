@@ -1,0 +1,27 @@
+[
+  {
+    "titulo": "Clean Code",
+    "isbn": "9780132350884",
+    "autor": "Robert C. Martin",
+    "anio": 2008,
+    "copias_total": 3,
+    "copias_disponibles": 2
+  },
+  {
+    "titulo": "Automate the Boring Stuff with Python",
+    "isbn": "9781593279929",
+    "autor": "Al Sweigart",
+    "anio": 2019,
+    "copias_total": 2,
+    "copias_disponibles": 2
+  },
+  {
+    "titulo": "Python Crash Course",
+    "isbn": "9781593279288",
+    "autor": "Eric Matthes",
+    "anio": 2019,
+    "copias_total": 1,
+    "copias_disponibles": 0
+  }
+]
+

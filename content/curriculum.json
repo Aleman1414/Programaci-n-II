@@ -1,0 +1,388 @@
+{
+  "course": {
+    "name": "Programación II (Python)",
+    "subtitle": "Recurso offline: teoría + ejemplos + ejercicios + quiz",
+    "note": "Contenido adaptado de un sílabo originalmente orientado a Java. En esta versión, los conceptos se explican y practican en Python."
+  },
+  "glossary": [
+    { "java": "Clase", "python": "class" },
+    { "java": "Objeto", "python": "instancia" },
+    { "java": "Constructor", "python": "__init__" },
+    { "java": "Método estático", "python": "@staticmethod" },
+    { "java": "Elemento de clase (static)", "python": "atributo de clase" },
+    { "java": "Herencia", "python": "herencia (class Hija(Padre))" },
+    { "java": "Polimorfismo", "python": "polimorfismo por duck typing" },
+    { "java": "Paquetes", "python": "módulos / paquetes" },
+    { "java": "Arreglos", "python": "list / tuple" },
+    { "java": "Arreglo redimensionable", "python": "list (dinámica)" },
+    { "java": "Excepciones", "python": "try/except" },
+    { "java": "GUI (Swing/JavaFX)", "python": "Tkinter" }
+  ],
+  "lessons": [
+    {
+      "id": "w01",
+      "week": 1,
+      "title": "Introducción y POO en Python",
+      "topics": [
+        "Estructura básica de un programa en Python",
+        "Comentarios y estilo",
+        "Conceptos POO: clase, objeto, atributo, método",
+        "UML básico: diagrama de clases (conceptual)",
+        "Convenciones de acceso en Python (_protegido, __name mangling)"
+      ],
+      "theory": "Python es un lenguaje multiparadigma: permite programación estructurada, funcional y orientada a objetos (POO).\n\nPOO en Python:\n- Una clase define un \"molde\".\n- Un objeto es una instancia.\n- Los atributos guardan estado.\n- Los métodos definen comportamiento.\n\nAcceso (encapsulación): Python no impone modificadores (public/private). Se usan convenciones:\n- publico: nombre\n- interno/protegido: _nombre\n- \"privado\" (name mangling): __nombre\n\nUML: úsalo para pensar el diseño (clases, atributos, métodos, relaciones). No es obligatorio para que el código funcione, pero ayuda para comunicar el modelo.",
+      "examples": [
+        {
+          "title": "Clase e instancia",
+          "code": "class Persona:\n    def __init__(self, nombre: str, edad: int):\n        self.nombre = nombre\n        self.edad = edad\n\n    def saludar(self) -> str:\n        return f\"Hola, soy {self.nombre} y tengo {self.edad} años\"\n\np = Persona(\"Ana\", 20)\nprint(p.saludar())\n",
+          "runnable": true
+        },
+        {
+          "title": "Atributo de clase y método de clase",
+          "code": "class Contador:\n    total = 0  # atributo de clase\n\n    def __init__(self):\n        Contador.total += 1\n\n    @classmethod\n    def creados(cls) -> int:\n        return cls.total\n\n_ = Contador(); _ = Contador(); _ = Contador()\nprint(\"Creados:\", Contador.creados())\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Modela una clase `CuentaBancaria` con `saldo` y métodos `depositar` y `retirar` (validando saldo).",
+        "Dibuja un UML simple (a mano) para 3 clases: `Empresa`, `Empleado`, `Departamento` (relación de contención).",
+        "Explica con tus palabras la diferencia entre atributo de instancia y atributo de clase."
+      ],
+      "quiz": [
+        {
+          "q": "¿Qué método se ejecuta al crear una instancia en Python?",
+          "options": ["main", "__init__", "__new__ siempre", "constructor()"],
+          "answer": 1,
+          "explanation": "Normalmente se inicializa el objeto en `__init__`. `__new__` existe, pero no es el constructor típico de uso diario."
+        },
+        {
+          "q": "¿Qué significa la convención `_atributo`?",
+          "options": ["Privado real", "Interno/uso por la clase (convención)", "Público", "Es una constante"],
+          "answer": 1,
+          "explanation": "Es una convención para indicar uso interno; no bloquea el acceso."
+        }
+      ]
+    },
+    {
+      "id": "w02",
+      "week": 2,
+      "title": "Métodos, herencia y módulos",
+      "topics": [
+        "Métodos de consulta/modificación (get/set) y propiedades",
+        "Instanciación e invocación de métodos",
+        "Sobrecarga (alternativas en Python)",
+        "Conversión de tipos",
+        "Herencia e importación de módulos/paquetes"
+      ],
+      "theory": "En Python, normalmente evitamos getters/setters verbosos y usamos atributos públicos o `@property` cuando necesitamos validar.\n\nSobrecarga: Python no soporta sobrecarga por firma como Java. Alternativas:\n- argumentos por defecto\n- `*args` / `**kwargs`\n- `functools.singledispatch` (avanzado)\n\nHerencia: `class Hija(Padre): ...` y `super()` para reutilizar inicialización o comportamiento.\n\nMódulos/paquetes: un archivo `.py` es un módulo; una carpeta con `__init__.py` es un paquete.",
+      "examples": [
+        {
+          "title": "property para validar",
+          "code": "class Producto:\n    def __init__(self, nombre: str, precio: float):\n        self.nombre = nombre\n        self.precio = precio\n\n    @property\n    def precio(self) -> float:\n        return self._precio\n\n    @precio.setter\n    def precio(self, value: float) -> None:\n        if value < 0:\n            raise ValueError(\"El precio no puede ser negativo\")\n        self._precio = float(value)\n\np = Producto(\"Mouse\", 10)\nprint(p.precio)\n",
+          "runnable": true
+        },
+        {
+          "title": "Herencia + super()",
+          "code": "class Animal:\n    def __init__(self, nombre: str):\n        self.nombre = nombre\n\n    def hablar(self) -> str:\n        return \"...\"\n\nclass Perro(Animal):\n    def __init__(self, nombre: str, raza: str):\n        super().__init__(nombre)\n        self.raza = raza\n\n    def hablar(self) -> str:\n        return \"guau\"\n\nprint(Perro(\"Bobby\", \"Labrador\").hablar())\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Crea `Empleado` y `Gerente(Empleado)` donde `Gerente` tenga una lista de empleados a cargo.",
+        "Implementa una función `parse_int(s)` que convierta texto a entero y maneje errores con `try/except`.",
+        "Reescribe un ejemplo de “sobrecarga” usando argumentos por defecto."
+      ],
+      "quiz": [
+        {
+          "q": "¿Cómo se define herencia en Python?",
+          "options": ["extends", "implements", "class Hija(Padre):", "inherit Padre -> Hija"],
+          "answer": 2,
+          "explanation": "La sintaxis es `class Hija(Padre):`."
+        }
+      ]
+    },
+    {
+      "id": "w03",
+      "week": 3,
+      "title": "Composición, polimorfismo, excepciones y colecciones",
+      "topics": [
+        "Composición (objetos dentro de objetos)",
+        "Polimorfismo (duck typing)",
+        "Entrada/Salida",
+        "Excepciones",
+        "Colecciones: list/tuple/dict y listas de objetos"
+      ],
+      "theory": "Composición: una clase usa otras clases como atributos (\"tiene un\").\n\nPolimorfismo: en Python, normalmente se basa en duck typing: si un objeto implementa el método que necesitas, puedes usarlo.\n\nI/O básico: `print`, `input`, y archivos con `open`.\n\nExcepciones: usa `try/except` para manejar errores esperados y mantener el programa estable.\n\nColecciones: `list` es dinámica y sirve como \"arreglo redimensionable\".",
+      "examples": [
+        {
+          "title": "Composición + lista de objetos",
+          "code": "class Item:\n    def __init__(self, nombre: str, precio: float):\n        self.nombre = nombre\n        self.precio = precio\n\nclass Carrito:\n    def __init__(self):\n        self.items: list[Item] = []\n\n    def agregar(self, item: Item) -> None:\n        self.items.append(item)\n\n    def total(self) -> float:\n        return sum(i.precio for i in self.items)\n\nc = Carrito()\nc.agregar(Item(\"Pan\", 1.5))\nc.agregar(Item(\"Leche\", 0.9))\nprint(\"Total:\", c.total())\n",
+          "runnable": true
+        },
+        {
+          "title": "Excepciones al convertir tipos",
+          "code": "def leer_entero(texto: str) -> int:\n    try:\n        return int(texto)\n    except ValueError:\n        return 0\n\nprint(leer_entero(\"123\"))\nprint(leer_entero(\"hola\"))\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Crea una clase `Empresa` que contenga una lista de `Empleado` y calcule nómina total.",
+        "Lee un archivo de texto y cuenta cuántas líneas tienen más de 30 caracteres.",
+        "Diseña una función `buscar_por_nombre(lista, nombre)` que devuelva coincidencias (case-insensitive)."
+      ],
+      "quiz": [
+        {
+          "q": "¿Cuál colección es más parecida a un arreglo redimensionable?",
+          "options": ["tuple", "list", "set", "str"],
+          "answer": 1,
+          "explanation": "`list` crece/disminuye dinámicamente."
+        }
+      ]
+    },
+    {
+      "id": "w04",
+      "week": 4,
+      "title": "Estructuras de control y atributos de clase",
+      "topics": [
+        "if/elif/else",
+        "for/while",
+        "break/continue",
+        "Atributos de clase vs instancia",
+        "CRUD en listas de objetos (buscar/modificar/eliminar)"
+      ],
+      "theory": "Control de flujo en Python:\n- Selección: `if/elif/else`\n- Repetición: `for` (iterables) y `while`\n- Saltos: `break`, `continue`\n\nPatrón típico para un mini-sistema:\n- guardar objetos en una lista\n- listar\n- buscar por criterio\n- modificar\n- eliminar",
+      "examples": [
+        {
+          "title": "Buscar/modificar/eliminar en lista de objetos",
+          "code": "class Alumno:\n    def __init__(self, cuenta: str, nombre: str):\n        self.cuenta = cuenta\n        self.nombre = nombre\n\nalumnos = [Alumno(\"1\", \"Ana\"), Alumno(\"2\", \"Luis\")]\n\n# buscar\nobj = next((a for a in alumnos if a.cuenta == \"2\"), None)\nif obj:\n    obj.nombre = \"Luis Pérez\"  # modificar\n\n# eliminar\nalumnos = [a for a in alumnos if a.cuenta != \"1\"]\n\nprint([(a.cuenta, a.nombre) for a in alumnos])\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Implementa un menú de consola con opciones: agregar, listar, buscar, modificar, eliminar.",
+        "Agrega validaciones: no permitir cuentas duplicadas.",
+        "Escribe 5 casos de prueba manuales (entradas → salida esperada)."
+      ],
+      "quiz": [
+        {
+          "q": "¿Cuál es la forma recomendada de iterar una lista en Python?",
+          "options": ["for i=0; i<n; i++", "for elemento in lista:", "repeat until", "foreach(lista)"],
+          "answer": 1,
+          "explanation": "Lo más idiomático es `for elemento in lista:` (o `for i, elemento in enumerate(lista):`)."
+        }
+      ]
+    },
+    {
+      "id": "w05",
+      "week": 5,
+      "title": "Cierre del proyecto de consola y repaso",
+      "topics": [
+        "Integración: clases + listas + control de flujo",
+        "Refactor básico: separar en funciones/módulos",
+        "Repaso parcial I"
+      ],
+      "theory": "Semana de integración: arma una versión completa (aunque simple) del sistema en consola.\n\nSugerencia: separa en módulos:\n- `modelos.py`\n- `repositorio.py` (maneja la lista)\n- `main.py` (menú)\n\nBuenas prácticas: nombres claros, funciones pequeñas y validaciones.",
+      "examples": [],
+      "exercises": [
+        "Entrega un mini-sistema en consola con persistencia opcional (JSON o CSV).",
+        "Refactoriza: mueve clases a un módulo y el menú a otro.",
+        "Agrega manejo de errores de entrada del usuario (try/except)."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w06",
+      "week": 6,
+      "title": "Listas dinámicas y métodos estáticos",
+      "topics": [
+        "List como estructura dinámica",
+        "Métodos estáticos y de clase",
+        "Repaso y discusión del parcial"
+      ],
+      "theory": "En Python, `list` se redimensiona automáticamente. Para utilidades que no dependen de instancia, usa `@staticmethod` o `@classmethod`.\n\n- `@staticmethod`: no recibe `self` ni `cls`.\n- `@classmethod`: recibe `cls` y suele usarse como constructor alternativo o para trabajar con estado de clase.",
+      "examples": [],
+      "exercises": [
+        "Crea una clase `Parser` con un `@staticmethod` para validar correos (regex simple).",
+        "Crea un `@classmethod` `desde_csv` que construya un objeto desde una línea CSV."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w07",
+      "week": 7,
+      "title": "GUI en Python con Tkinter (Parte I–II)",
+      "topics": [
+        "Ventana, frames y layout (grid/pack)",
+        "Widgets: Label, Entry, Button, Listbox",
+        "Eventos y callbacks",
+        "Guardar objetos desde la GUI"
+      ],
+      "theory": "Tkinter es la librería estándar de GUI en Python.\n\nEstructura típica:\n- Una clase `App(tk.Tk)` o `App(ttk.Frame)` que construye la UI.\n- Un \"repositorio\" o clase contenedora que encapsula la lista y el CRUD.\n- La UI solo captura eventos y llama a la lógica.\n\nLayout:\n- `grid` para formularios (filas/columnas).\n- `pack` para contenedores simples.\n\nObjetivo: CRUD mínimo en memoria (agregar/listar/seleccionar/eliminar) con validación básica y mensajes al usuario.",
+      "examples": [
+        {
+          "title": "Ventana + formulario + botón (estructura mínima)",
+          "code": "import tkinter as tk\nfrom tkinter import ttk\n\nclass App(tk.Tk):\n    def __init__(self):\n        super().__init__()\n        self.title(\"Mi primera GUI\")\n        self.geometry(\"420x160\")\n\n        self.var_nombre = tk.StringVar()\n\n        root = ttk.Frame(self, padding=12)\n        root.pack(fill=\"both\", expand=True)\n\n        ttk.Label(root, text=\"Nombre\").grid(row=0, column=0, sticky=\"w\")\n        ttk.Entry(root, textvariable=self.var_nombre).grid(row=0, column=1, sticky=\"we\", padx=8)\n        ttk.Button(root, text=\"Saludar\", command=self.saludar).grid(row=1, column=0, columnspan=2, sticky=\"w\", pady=10)\n\n        root.grid_columnconfigure(1, weight=1)\n\n    def saludar(self):\n        print(\"Hola\", self.var_nombre.get())\n\nApp().mainloop()\n",
+          "runnable": false
+        }
+      ],
+      "exercises": [
+        "Crea una GUI con formulario (cuenta, nombre, correo) y botón Agregar.",
+        "Muestra los elementos en una `ttk.Treeview` (cuenta, nombre, correo).",
+        "Al seleccionar una fila, carga los datos al formulario.",
+        "Agrega validación: cuenta numérica y campos obligatorios."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w08",
+      "week": 8,
+      "title": "Persistencia en archivos (leer/escribir)",
+      "topics": [
+        "Archivos de texto",
+        "CSV / JSON (stdlib)",
+        "Guardar y cargar lista de objetos"
+      ],
+      "theory": "Persistencia simple:\n- JSON: ideal para estructuras (dict/list)\n- CSV: ideal para tablas simples\n\nUsa `json.dump`/`json.load` para serializar, y convierte objetos a dict (y viceversa).",
+      "examples": [
+        {
+          "title": "Guardar/cargar JSON",
+          "code": "import json\nfrom dataclasses import dataclass, asdict\n\n@dataclass\nclass Alumno:\n    cuenta: str\n    nombre: str\n\nalumnos = [Alumno(\"1\",\"Ana\"), Alumno(\"2\",\"Luis\")]\n\n# guardar\nwith open(\"alumnos.json\", \"w\", encoding=\"utf-8\") as f:\n    json.dump([asdict(a) for a in alumnos], f, ensure_ascii=False, indent=2)\n\n# cargar\nwith open(\"alumnos.json\", \"r\", encoding=\"utf-8\") as f:\n    data = json.load(f)\n\nrecuperados = [Alumno(**d) for d in data]\nprint(recuperados)\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Integra guardar/cargar en tu proyecto GUI (JSON recomendado).",
+        "Maneja el caso de archivo inexistente (FileNotFoundError).",
+        "Agrega un botón \"Guardar\" y guarda automáticamente al agregar/actualizar/eliminar."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w09",
+      "week": 9,
+      "title": "GUI (Parte III) y repaso",
+      "topics": [
+        "Mostrar datos tabulares",
+        "Repaso parcial II"
+      ],
+      "theory": "Para tablas en Tkinter usa `ttk.Treeview`. Permite:\n- definir columnas\n- insertar filas\n- seleccionar una fila para editar\n\nPatrón recomendado:\n1) UI muestra tabla\n2) UI captura selección\n3) UI carga datos al formulario\n4) UI llama al repositorio para actualizar\n5) UI refresca tabla",
+      "examples": [
+        {
+          "title": "Treeview básico (tabla)",
+          "code": "import tkinter as tk\nfrom tkinter import ttk\n\nroot = tk.Tk()\nroot.title(\"Tabla\")\n\ncols = (\"cuenta\", \"nombre\")\ntree = ttk.Treeview(root, columns=cols, show=\"headings\")\ntree.heading(\"cuenta\", text=\"Cuenta\")\ntree.heading(\"nombre\", text=\"Nombre\")\n\nfor row in [(\"1\", \"Ana\"), (\"2\", \"Luis\")]:\n    tree.insert(\"\", \"end\", iid=row[0], values=row)\n\ntree.pack(fill=\"both\", expand=True, padx=10, pady=10)\nroot.mainloop()\n",
+          "runnable": false
+        }
+      ],
+      "exercises": [
+        "Cambia tu Listbox por un Treeview con columnas (cuenta, nombre).",
+        "Al seleccionar una fila, carga los datos al formulario para editar."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w10",
+      "week": 10,
+      "title": "GUI (CRUD): buscar y modificar",
+      "topics": [
+        "Búsquedas por criterio",
+        "Editar registros desde GUI",
+        "Repaso y discusión del parcial"
+      ],
+      "theory": "Implementa búsqueda por:\n- cuenta exacta\n- nombre contiene (case-insensitive)\n\nPara modificar, selecciona, edita el formulario y guarda cambios en la lista + refresca la tabla.",
+      "examples": [],
+      "exercises": [
+        "Implementa búsqueda por nombre y muestra resultados en la tabla.",
+        "Implementa edición y confirma con un diálogo (messagebox)."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w11",
+      "week": 11,
+      "title": "GUI (CRUD): eliminar y contenedores (Parte I)",
+      "topics": [
+        "Eliminar registros con confirmación",
+        "Clase contenedora (repositorio) para separar lógica",
+        "Persistencia opcional"
+      ],
+      "theory": "Separa responsabilidades:\n- `Repositorio`: guarda/busca/modifica/elimina\n- `UI`: captura eventos y muestra\n\nEsto mejora mantenibilidad y facilita pruebas.",
+      "examples": [
+        {
+          "title": "Repositorio (clase contenedora) para CRUD en memoria",
+          "code": "from dataclasses import dataclass\n\n@dataclass\nclass Alumno:\n    cuenta: str\n    nombre: str\n\nclass Repositorio:\n    def __init__(self):\n        self.items: list[Alumno] = []\n\n    def agregar(self, a: Alumno):\n        if any(x.cuenta == a.cuenta for x in self.items):\n            raise ValueError(\"Cuenta duplicada\")\n        self.items.append(a)\n\n    def buscar(self, cuenta: str) -> Alumno | None:\n        return next((x for x in self.items if x.cuenta == cuenta), None)\n",
+          "runnable": true
+        }
+      ],
+      "exercises": [
+        "Crea una clase `RepositorioAlumnos` con métodos CRUD.",
+        "Conecta tu GUI a la clase repositorio."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w12",
+      "week": 12,
+      "title": "GUI contenedora (Parte II) y validaciones",
+      "topics": [
+        "Validación de inputs",
+        "Mensajes de error al usuario",
+        "Búsqueda desde clase contenedora"
+      ],
+      "theory": "Validación mínima recomendada:\n- campos requeridos\n- formatos (solo números, correo, etc.)\n- duplicados\n\nUsa `tkinter.messagebox` para feedback claro.",
+      "examples": [],
+      "exercises": [
+        "Valida que cuenta sea numérica y única.",
+        "Muestra errores con `messagebox.showerror`."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w13",
+      "week": 13,
+      "title": "UX básica: consideraciones de interfaz y búsquedas avanzadas",
+      "topics": [
+        "Usabilidad: etiquetas, alineación, mensajes",
+        "Búsqueda por múltiples parámetros"
+      ],
+      "theory": "UX práctica:\n- Etiquetas claras\n- Botones consistentes\n- Estado visible (qué está seleccionado)\n\nBúsqueda avanzada: combina filtros (por ejemplo, nombre contiene + estado).",
+      "examples": [],
+      "exercises": [
+        "Agrega un campo de filtro y un botón Limpiar.",
+        "Implementa búsqueda con dos campos (cuenta y nombre)."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w14",
+      "week": 14,
+      "title": "Entrega del proyecto final y repaso III",
+      "topics": [
+        "Presentación/defensa",
+        "Repaso integral"
+      ],
+      "theory": "Checklist de entrega:\n- Flujo completo CRUD\n- Persistencia\n- Validaciones\n- UI consistente\n- Código organizado en módulos",
+      "examples": [],
+      "exercises": [
+        "Prepara un README del proyecto final (cómo ejecutar, qué hace, screenshots opcionales).",
+        "Ensaya una defensa de 5 minutos (modelo, decisiones y demo)."
+      ],
+      "quiz": []
+    },
+    {
+      "id": "w15",
+      "week": 15,
+      "title": "Cierre del curso",
+      "topics": [
+        "Revisión de examen",
+        "Retroalimentación y calificaciones"
+      ],
+      "theory": "Cierre: revisa errores comunes, buenas prácticas y próximos pasos (estructuras de datos, testing, web, bases de datos).",
+      "examples": [],
+      "exercises": [
+        "Haz una autoevaluación: ¿qué conceptos dominas y cuáles necesitas reforzar?",
+        "Propón una mejora al proyecto final (feature extra)."
+      ],
+      "quiz": []
+    }
+  ]
+}
