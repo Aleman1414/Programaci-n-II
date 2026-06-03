@@ -1,23 +1,45 @@
 from __future__ import annotations
 
+import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
-from .content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
-from .runner import run_code
+if __package__ in {None, ""}:
+    pkg_root = Path(__file__).resolve().parent.parent
+    if str(pkg_root) not in sys.path:
+        sys.path.insert(0, str(pkg_root))
+    from pyii_tutor.content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
+    from pyii_tutor.runner import run_code
+else:
+    from .content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
+    from .runner import run_code
 
 
 class TutorApp:
+    BG = "#F5F7FB"
+    SURFACE = "#FFFFFF"
+    SURFACE_ALT = "#E2E8F0"
+    TEXT = "#0F172A"
+    MUTED = "#475569"
+    BORDER = "#D6DEEA"
+    ACCENT = "#2563EB"
+    ACCENT_HOVER = "#1D4ED8"
+    ACCENT_SOFT = "#DBEAFE"
+    CODE_BG = "#0F172A"
+    CODE_FG = "#E2E8F0"
+
     def __init__(self) -> None:
         self.curriculum: Curriculum = load_curriculum()
         self.root = tk.Tk()
         self.root.title(self.curriculum.course.name)
         self.root.geometry("1120x720")
         self.root.minsize(1080, 700)
-        self.root.configure(bg="#272d37")
+        self.root.configure(bg=self.BG)
 
         self._selected_lesson: Lesson | None = None
+        self._selected_example_index: int | None = None
         self._quiz_index = 0
         self._quiz_score = 0
         self._quiz_answer_var = tk.IntVar(value=-1)
@@ -38,32 +60,58 @@ class TutorApp:
         except tk.TclError:
             pass
 
-        style.configure("TFrame", background="#272d37")
-        style.configure("TLabel", background="#272d37", foreground="#f0f0f5")
-        style.configure("Header.TLabel", font="Segoe UI 18 bold", foreground="#ffffff", background="#272d37")
-        style.configure("SubHeader.TLabel", font="Segoe UI 11", foreground="#c8cdd7", background="#272d37")
-        style.configure("Card.TFrame", background="#323c4c")
-        style.configure("Card.TLabelframe", background="#323c4c", foreground="#d3d7e0", font="Segoe UI 10 bold")
-        style.configure("Card.TLabelframe.Label", background="#323c4c", foreground="#d3d7e0")
-        style.configure("Accent.TButton", font="Segoe UI 10 bold", foreground="#ffffff", background="#6a89ff")
+        style.configure("TFrame", background=self.BG)
+        style.configure("TLabel", background=self.BG, foreground=self.TEXT)
+        style.configure("Header.TLabel", font="Segoe UI 18 bold", foreground=self.TEXT, background=self.BG)
+        style.configure("SubHeader.TLabel", font="Segoe UI 11", foreground=self.MUTED, background=self.BG)
+        style.configure("Card.TFrame", background=self.SURFACE)
+        style.configure("Card.TLabelframe", background=self.SURFACE, foreground=self.TEXT, font="Segoe UI 10 bold")
+        style.configure("Card.TLabelframe.Label", background=self.SURFACE, foreground=self.TEXT)
+        style.configure("Accent.TButton", font="Segoe UI 10 bold", foreground="white", background=self.ACCENT)
         style.map(
             "Accent.TButton",
-            background=[("active", "#5577f2"), ("pressed", "#405ecc")],
+            background=[("active", self.ACCENT_HOVER), ("pressed", self.ACCENT_HOVER)],
+            foreground=[("disabled", "#CBD5E1")],
         )
-        style.configure("TNotebook", background="#272d37", borderwidth=0)
-        style.configure("TNotebook.Tab", background="#2d3648", foreground="#d7dbe7", padding=[12, 10], font="Segoe UI 10 bold")
+        style.configure("TNotebook", background=self.BG, borderwidth=0)
+        style.configure(
+            "TNotebook.Tab",
+            background=self.SURFACE_ALT,
+            foreground=self.TEXT,
+            padding=[14, 10],
+            font="Segoe UI 10 bold",
+        )
         style.map(
             "TNotebook.Tab",
-            background=[("selected", "#4f6bf2")],
-            foreground=[("selected", "#ffffff")],
+            background=[("selected", self.ACCENT), ("active", self.ACCENT_SOFT)],
+            foreground=[("selected", "#ffffff"), ("active", self.TEXT)],
         )
-        style.configure("Treeview", background="#2d3648", fieldbackground="#2d3648", foreground="#edf0f7", rowheight=28, bordercolor="#272d37", borderwidth=0)
+        style.configure(
+            "Treeview",
+            background=self.SURFACE,
+            fieldbackground=self.SURFACE,
+            foreground=self.TEXT,
+            rowheight=28,
+            bordercolor=self.BORDER,
+            borderwidth=0,
+        )
         style.map(
             "Treeview",
-            background=[("selected", "#5d7bff")],
-            foreground=[("selected", "#ffffff")],
+            background=[("selected", self.ACCENT_SOFT)],
+            foreground=[("selected", self.TEXT)],
         )
-        style.configure("TScrollbar", background="#2d3648", troughcolor="#222a35", arrowcolor="#ffffff")
+        style.configure(
+            "Treeview.Heading",
+            background=self.SURFACE_ALT,
+            foreground=self.TEXT,
+            relief="flat",
+            font="Segoe UI 10 bold",
+        )
+        style.map(
+            "Treeview.Heading",
+            background=[("active", "#CBD5E1")],
+        )
+        style.configure("TScrollbar", background=self.SURFACE_ALT, troughcolor=self.BG, arrowcolor=self.TEXT)
 
     def run(self) -> None:
         self.root.mainloop()
@@ -97,10 +145,10 @@ class TutorApp:
             lesson_list_container,
             activestyle="dotbox",
             height=28,
-            bg="#222a30",
-            fg="#eef0fc",
-            selectbackground="#5b78ff",
-            selectforeground="#ffffff",
+            bg=self.SURFACE,
+            fg=self.TEXT,
+            selectbackground=self.ACCENT_SOFT,
+            selectforeground=self.TEXT,
             highlightthickness=0,
             bd=0,
             relief="flat",
@@ -159,9 +207,9 @@ class TutorApp:
             self.tab_theory,
             wrap="word",
             font=("Segoe UI", 11),
-            background="#1f2430",
-            foreground="#e7e9ff",
-            insertbackground="#ffffff",
+            background=self.SURFACE,
+            foreground=self.TEXT,
+            insertbackground=self.TEXT,
             relief="flat",
             borderwidth=0,
             padx=12,
@@ -185,10 +233,10 @@ class TutorApp:
             list_container,
             activestyle="dotbox",
             height=18,
-            bg="#1e2432",
-            fg="#e7e9ff",
-            selectbackground="#5d7dff",
-            selectforeground="#ffffff",
+            bg=self.SURFACE,
+            fg=self.TEXT,
+            selectbackground=self.ACCENT_SOFT,
+            selectforeground=self.TEXT,
             highlightthickness=0,
             bd=0,
             relief="flat",
@@ -211,8 +259,8 @@ class TutorApp:
             code_card,
             wrap="none",
             font=("Consolas", 11),
-            background="#1b1f2a",
-            foreground="#f4f7ff",
+            background=self.CODE_BG,
+            foreground=self.CODE_FG,
             insertbackground="#ffffff",
             relief="flat",
             borderwidth=0,
@@ -225,6 +273,7 @@ class TutorApp:
         self.run_button = ttk.Button(actions, text="Ejecutar", command=self._run_current_code, style="Accent.TButton")
         self.run_button.pack(side="left")
         ttk.Button(actions, text="Copiar", command=self._copy_current_code, style="Accent.TButton").pack(side="left", padx=8)
+        ttk.Button(actions, text="Limpiar salida", command=self._clear_output, style="Accent.TButton").pack(side="left")
 
         output_card = ttk.LabelFrame(right, text="Salida", style="Card.TLabelframe", padding=10)
         output_card.pack(fill="both", expand=False, pady=(10, 0))
@@ -233,9 +282,9 @@ class TutorApp:
             wrap="word",
             height=8,
             font=("Consolas", 11),
-            background="#1b1f2a",
-            foreground="#f4f7ff",
-            insertbackground="#ffffff",
+            background=self.SURFACE,
+            foreground=self.TEXT,
+            insertbackground=self.TEXT,
             relief="flat",
             borderwidth=0,
         )
@@ -248,9 +297,9 @@ class TutorApp:
             exercises_card,
             wrap="word",
             font=("Segoe UI", 11),
-            background="#1f2430",
-            foreground="#e7e9ff",
-            insertbackground="#ffffff",
+            background=self.SURFACE,
+            foreground=self.TEXT,
+            insertbackground=self.TEXT,
             relief="flat",
             borderwidth=0,
             padx=12,
@@ -291,9 +340,9 @@ class TutorApp:
             glossary_card,
             wrap="word",
             font=("Segoe UI", 11),
-            background="#1f2430",
-            foreground="#e7e9ff",
-            insertbackground="#ffffff",
+            background=self.SURFACE,
+            foreground=self.TEXT,
+            insertbackground=self.TEXT,
             relief="flat",
             borderwidth=0,
             padx=12,
@@ -318,6 +367,7 @@ class TutorApp:
 
     def _select_lesson(self, lesson: Lesson) -> None:
         self._selected_lesson = lesson
+        self._selected_example_index = None
         self.lesson_title.configure(text=f"Semana {lesson.week:02d} — {lesson.title}")
         example_count = len(lesson.examples)
         quiz_count = len(lesson.quiz)
@@ -342,12 +392,20 @@ class TutorApp:
 
     def _load_examples(self, lesson: Lesson) -> None:
         self.examples_list.delete(0, "end")
-        for ex in lesson.examples:
-            self.examples_list.insert("end", ex.title)
-        self.example_title.configure(text="Selecciona un ejemplo")
+        self.example_title.configure(text="Ejemplos")
         self.code_text.delete("1.0", "end")
         self.output_text.delete("1.0", "end")
-        self.run_button.configure(state=("normal" if lesson.examples else "disabled"))
+        for ex in lesson.examples:
+            self.examples_list.insert("end", ex.title)
+        if lesson.examples:
+            self.examples_list.selection_clear(0, "end")
+            self.examples_list.selection_set(0)
+            self.examples_list.activate(0)
+            self.examples_list.see(0)
+            self._show_example(0)
+        else:
+            self.example_title.configure(text="Sin ejemplos disponibles")
+            self.run_button.configure(state="disabled")
 
     def _on_example_select(self, _evt: object) -> None:
         if not self._selected_lesson:
@@ -356,9 +414,15 @@ class TutorApp:
         if not sel:
             return
         idx = int(sel[0])
+        self._show_example(idx)
+
+    def _show_example(self, idx: int) -> None:
+        if not self._selected_lesson:
+            return
         if not (0 <= idx < len(self._selected_lesson.examples)):
             return
         ex = self._selected_lesson.examples[idx]
+        self._selected_example_index = idx
         self.example_title.configure(text=ex.title)
         self.code_text.delete("1.0", "end")
         self.code_text.insert("1.0", ex.code)
@@ -368,6 +432,7 @@ class TutorApp:
     def _run_current_code(self) -> None:
         code = self.code_text.get("1.0", "end").strip("\n")
         if not code.strip():
+            self.status_label.configure(text="No hay código para ejecutar.")
             return
         res = run_code(code)
         out = []
@@ -381,14 +446,21 @@ class TutorApp:
             out.append("(sin salida)")
         self.output_text.delete("1.0", "end")
         self.output_text.insert("1.0", "".join(out))
+        self.status_label.configure(text="Ejecución completada.")
 
     def _copy_current_code(self) -> None:
         code = self.code_text.get("1.0", "end").strip("\n")
         if not code.strip():
+            self.status_label.configure(text="No hay código para copiar.")
             return
         self.root.clipboard_clear()
         self.root.clipboard_append(code)
         self.root.update()
+        self.status_label.configure(text="Código copiado al portapapeles.")
+
+    def _clear_output(self) -> None:
+        self.output_text.delete("1.0", "end")
+        self.status_label.configure(text="Salida limpiada.")
 
     def _set_text(self, widget: tk.Text, text: str) -> None:
         widget.configure(state="normal")

@@ -61,7 +61,13 @@ def load_curriculum(path: str | Path | None = None) -> Curriculum:
     if path is None:
         path = _repo_root() / "content" / "curriculum.json"
     path = Path(path)
-    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not path.exists():
+        raise FileNotFoundError(f"No se encontró el archivo de contenido: {path}")
+
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"El archivo de contenido no es un JSON válido: {path}") from exc
 
     course = raw.get("course") or {}
     course_meta = CourseMeta(
@@ -123,4 +129,3 @@ def lesson_exercises_text(lesson: Lesson) -> str:
     if not lesson.exercises:
         return "No hay ejercicios aún para esta semana."
     return "Ejercicios:\n" + "\n".join(f"{i+1}. {e}" for i, e in enumerate(lesson.exercises))
-
