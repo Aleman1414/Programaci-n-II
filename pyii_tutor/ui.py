@@ -6,15 +6,12 @@ from pathlib import Path
 from tkinter import messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
-if __package__ in {None, ""}:
-    pkg_root = Path(__file__).resolve().parent.parent
-    if str(pkg_root) not in sys.path:
-        sys.path.insert(0, str(pkg_root))
-    from pyii_tutor.content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
-    from pyii_tutor.runner import run_code
-else:
-    from .content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
-    from .runner import run_code
+pkg_root = Path(__file__).resolve().parent.parent
+if str(pkg_root) not in sys.path:
+    sys.path.insert(0, str(pkg_root))
+
+from pyii_tutor.content import Curriculum, Lesson, load_curriculum, lesson_exercises_text, lesson_topics_text
+from pyii_tutor.runner import run_code
 
 
 class TutorApp:
