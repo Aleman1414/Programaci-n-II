@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from models import Libro
+from .models import Libro
 
 
 class JsonStorage:

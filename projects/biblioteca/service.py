@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from repository import RepositorioLibros
-from storage import JsonStorage
+from .repository import RepositorioLibros
+from .storage import JsonStorage
 
 
 class Biblioteca:

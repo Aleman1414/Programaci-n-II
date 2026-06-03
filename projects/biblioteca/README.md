@@ -16,6 +16,10 @@ Desde la raíz del repo:
 python3 projects/biblioteca/app.py
 ```
 
+Archivo principal:
+
+- [projects/biblioteca/app.py](/Users/angel-aleman/Documents/Coding/Dev/Programación-II/projects/biblioteca/app.py)
+
 Los datos se guardan en `projects/biblioteca/data/libros.json`.
 
 ## Guía de conceptos

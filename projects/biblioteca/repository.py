@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from models import Libro, ValidationError
+from .models import Libro, ValidationError
 
 
 class RepositorioLibros:
